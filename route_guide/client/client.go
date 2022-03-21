@@ -3,16 +3,18 @@ package main
 import (
 	"context"
 	"flag"
+	"io"
+
 	// "io"
 	"log"
 	// "math/rand"
 	"time"
 
+	pb "github.com/nikit34/grpc_basic_tutorial/route_guide/routeguide"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/examples/data"
-	pb "github.com/nikit34/grpc_basic_tutorial/route_guide/routeguide"
 )
 
 
@@ -33,6 +35,32 @@ func printFeature(client pb.RouteGuideClient, point *pb.Point) {
 		log.Fatalf("%v.GetFeatures(_) = _, %v: ", client, err)
 	}
 	log.Println(feature)
+}
+
+func printFeatures(client pb.RouteGuideClient, rect *pb.Rectangle) {
+	log.Printf("Looking for features within %v", rect)
+	ctx, cancel := context.WithTimeout(context.Background(), 10 * time.Second)
+	defer cancel()
+
+	stream, err := client.ListFeatures(ctx, rect)
+	if err != nil {
+		log.Fatalf("%v.ListFeatures(_) = _, %v", client, err)
+	}
+	for {
+		feature, err := stream.Recv()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			log.Fatalf("%v.ListFeatures(_) = _, %v", client, err)
+		}
+		log.Printf(
+			"Feature: name: %q, point:(%v, %v)",
+			feature.GetName(),
+			feature.GetLocation().GetLatitude(),
+			feature.GetLocation().GetLongitude(),
+		)
+	}
 }
 
 func main() {
@@ -62,10 +90,10 @@ func main() {
 
 	printFeature(client, &pb.Point{Latitude: 0, Longitude: 0})
 
-	// printFeatures(client, &pb.Rectangle{
-	// 	Lo: &pb.Point{Latitude: 400000000, Longitude: -750000000},
-	// 	Hi: &pb.Point{Latitude: 420000000, Longitude: -730000000},
-	// })
+	printFeatures(client, &pb.Rectangle{
+		Lo: &pb.Point{Latitude: 400000000, Longitude: -750000000},
+		Hi: &pb.Point{Latitude: 420000000, Longitude: -730000000},
+	})
 
 	// runRecordRoute(client)
 
