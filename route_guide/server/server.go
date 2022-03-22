@@ -10,7 +10,7 @@ import (
 	"log"
 	"math"
 	"net"
-	// "sync"
+	"sync"
 	"time"
 
 	"google.golang.org/grpc/credentials"
@@ -35,7 +35,7 @@ type routeGuideServer struct {
 	pb.UnimplementedRouteGuideServer
 	savedFeatures []*pb.Feature
 
-	// mu sync.Mutex
+	mu sync.Mutex
 	routeNotes map[string][]*pb.RouteNote
 }
 
@@ -121,6 +121,36 @@ func (s *routeGuideServer) RecordRoute(stream pb.RouteGuide_RecordRouteServer) e
                 distance += calcDistance(lastPoint, point)
             }
             lastPoint = point
+        }
+    }
+}
+
+func serialize(point *pb.Point) string {
+    return fmt.Sprintf("%d %d", point.Latitude, point.Longitude)
+}
+
+func (s *routeGuideServer) RouteChat(stream pb.RouteGuide_RouteChatServer) error {
+    for {
+        in, err := stream.Recv()
+        if err == io.EOF {
+            return nil
+        }
+        if err != nil {
+            return err
+        }
+
+        key := serialize(in.Location)
+
+        s.mu.Lock()
+        s.routeNotes[key] = append(s.routeNotes[key], in)
+        rn := make([]*pb.RouteNote, len(s.routeNotes[key]))
+        copy(rn, s.routeNotes[key])
+        s.mu.Unlock()
+
+        for _, note := range rn {
+            if err := stream.Send(note); err != nil {
+                return err
+            }
         }
     }
 }
