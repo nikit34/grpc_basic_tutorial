@@ -10,7 +10,7 @@ import (
 	"log"
 	"math"
 	"net"
-	"sync"
+	// "sync"
 	"time"
 
 	"google.golang.org/grpc/credentials"

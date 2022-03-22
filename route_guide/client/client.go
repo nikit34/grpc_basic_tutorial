@@ -4,10 +4,8 @@ import (
 	"context"
 	"flag"
 	"io"
-
-	// "io"
 	"log"
-	// "math/rand"
+	"math/rand"
 	"time"
 
 	pb "github.com/nikit34/grpc_basic_tutorial/route_guide/routeguide"
@@ -63,6 +61,41 @@ func printFeatures(client pb.RouteGuideClient, rect *pb.Rectangle) {
 	}
 }
 
+func randomPoint(r *rand.Rand) *pb.Point {
+	lat := (r.Int31n(180) - 90) * 1e7
+	long := (r.Int31n(360) - 180) * 1e7
+	return &pb.Point{Latitude: lat, Longitude: long}
+}
+
+func runRecordRoute(client pb.RouteGuideClient) {
+	r := rand.New(rand.NewSource(time.Now().UnixNano()))
+	pointCount := int(r.Int31n(100)) + 2
+	var points []*pb.Point
+	for i := 0; i < pointCount; i++ {
+		points = append(points, randomPoint(r))
+	}
+	log.Printf("Traversing %d points.", len(points))
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10 * time.Second)
+	defer cancel()
+
+	stream, err := client.RecordRoute(ctx)
+	if err != nil {
+		log.Fatalf("%v.RecordRoute(_) = _, %v", client, err)
+	}
+	for _, point := range points {
+		if err := stream.Send(point); err != nil {
+			log.Fatalf("%v.Send(%v) = %v", stream, point, err)
+		}
+	}
+
+	reply, err := stream.CloseAndRecv()
+	if err != nil {
+		log.Fatalf("%v.CloseAndRecv() gor error %v, want %v", stream, err, nil)
+	}
+	log.Printf("Route summary: %v", reply)
+}
+
 func main() {
 	flag.Parse()
 	var opts []grpc.DialOption
@@ -95,7 +128,7 @@ func main() {
 		Hi: &pb.Point{Latitude: 420000000, Longitude: -730000000},
 	})
 
-	// runRecordRoute(client)
+	runRecordRoute(client)
 
 	// runRouteChat(client)
 }
