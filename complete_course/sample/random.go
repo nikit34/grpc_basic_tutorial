@@ -67,6 +67,17 @@ func randomScreenPanel() pb.Screen_Panel {
 	return pb.Screen_OLED
 }
 
+func randomScreenResolution() *pb.Screen_Resolution {
+	height := randomInt(1000, 4320)
+	width := height * 16 / 9
+
+	resolution := &pb.Screen_Resolution{
+		Height: uint32(height),
+		Width: uint32(width),
+	}
+	return resolution
+}
+
 func randomStringFromSet(a ...string) string {
 	n := len(a)
 	if n == 0 {
