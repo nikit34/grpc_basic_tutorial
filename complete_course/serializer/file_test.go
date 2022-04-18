@@ -12,7 +12,7 @@ import (
 )
 
 
-func TestToFileSerializer(t *testing.T) {
+func TestToBinaryFileSerializer(t *testing.T) {
 	t.Parallel()
 
 	binaryFile := "../tmp/laptop.bin"
@@ -22,7 +22,7 @@ func TestToFileSerializer(t *testing.T) {
 	require.NoError(t, err)
 }
 
-func TestFromFileSerializer(t *testing.T){
+func TestFromBinaryFileSerializer(t *testing.T){
 	t.Parallel()
 
 	binaryFile := "../tmp/laptop.bin"
@@ -33,4 +33,14 @@ func TestFromFileSerializer(t *testing.T){
 	err := serializer.ReadProtobufFromBinaryFile(binaryFile, laptop2)
 	require.NoError(t, err)
 	require.True(t, proto.Equal(laptop1, laptop2))
+}
+
+func TestToJSONFileSerializer(t *testing.T) {
+	t.Parallel()
+
+	jsonFile := "../tmp/laptop.json"
+	laptop1 := sample.NewLaptop()
+
+	err := serializer.WriteProtobufToJSONFile(laptop1, jsonFile)
+	require.NoError(t, err)
 }
