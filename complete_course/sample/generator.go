@@ -1,9 +1,13 @@
 package sample
 
-import "github.com/nikit34/grpc_basic_tutorial/complete_course/pb"
+import (
+	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
+
+	"github.com/nikit34/grpc_basic_tutorial/complete_course/pb"
+)
 
 
-func Keyboard() *pb.Keyboard {
+func NewKeyboard() *pb.Keyboard {
 	keyboard := &pb.Keyboard{
 		Layout: randomKeyboardLayout(),
 		Backlit: randomBool(),
@@ -88,4 +92,28 @@ func NewScreen() *pb.Screen {
 		Multitouch: randomBool(),
 	}
 	return screen
+}
+
+func NewLaptop() *pb.Laptop {
+	brand := randomLaptopBrand()
+	name := randomLaptopName(brand)
+
+	laptop := &pb.Laptop{
+		Id: randomID(),
+		Brand: brand,
+		Name: name,
+		Cpu: NewCPU(),
+		Gpus: []*pb.GPU{NewGPU()},
+		Ram: NewRAM(),
+		Storages: []*pb.Storage{NewSSD(), NewHDD()},
+		Screen: NewScreen(),
+		Keyboard: NewKeyboard(),
+		Weight: &pb.Laptop_WeightKg{
+			WeightKg: randomFloat64(1.0, 3.0),
+		},
+		PriceUsd: randomFloat64(1500, 3000),
+		ReleaseYear: uint32(randomInt(2015, 2022)),
+		UpdatedAt: timestamppb.Now(),
+	}
+	return laptop
 }

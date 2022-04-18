@@ -3,6 +3,8 @@ package sample
 import (
 	"math/rand"
 
+	"github.com/google/uuid"
+
 	"github.com/nikit34/grpc_basic_tutorial/complete_course/pb"
 )
 
@@ -24,6 +26,10 @@ func randomCPUBrand() string {
 
 func randomGPUBrand() string {
 	return randomStringFromSet("NVIDIA", "AMD")
+}
+
+func randomLaptopBrand() string {
+	return randomStringFromSet("Apple", "Dell", "Lenovo")
 }
 
 func randomCPUName(brand string) string {
@@ -58,6 +64,17 @@ func randomGPUName(brand string) string {
 		"RX 5700-XT",
 		"RX Vega-56",
 	)
+}
+
+func randomLaptopName(brand string) string {
+	switch brand {
+	case "Apple":
+		return randomStringFromSet("Macbook Air", "Macbook Pro")
+	case "Dell":
+		return randomStringFromSet("Latitude", "Vistro", "Alienware")
+	default:
+		return randomStringFromSet("Thinkpad X1", "Thinkpad P1", "Thinkpad P53")
+	}
 }
 
 func randomScreenPanel() pb.Screen_Panel {
@@ -100,4 +117,8 @@ func randomFloat32(min, max float32) float32 {
 
 func randomBool() bool {
 	return rand.Intn(2) == 1
+}
+
+func randomID() string {
+	return uuid.New().String()
 }
