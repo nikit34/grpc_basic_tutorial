@@ -22,6 +22,10 @@ func randomCPUBrand() string {
 	return randomStringFromSet("Intel", "AMD")
 }
 
+func randomGPUBrand() string {
+	return randomStringFromSet("NVIDIA", "AMD")
+}
+
 func randomCPUName(brand string) string {
 	if brand == "Intel" {
 		return randomStringFromSet(
@@ -39,6 +43,30 @@ func randomCPUName(brand string) string {
 	)
 }
 
+func randomGPUName(brand string) string {
+	if brand == "NVIDIA" {
+		return randomStringFromSet(
+			"RTX 2060",
+			"RTX 2070",
+			"GTX 1070",
+			"GTX 1660-Ti",
+		)
+	}
+	return randomStringFromSet(
+		"RX 590",
+		"RX 580",
+		"RX 5700-XT",
+		"RX Vega-56",
+	)
+}
+
+func randomScreenPanel() pb.Screen_Panel {
+	if rand.Intn(2) == 1 {
+		return pb.Screen_IPS
+	}
+	return pb.Screen_OLED
+}
+
 func randomStringFromSet(a ...string) string {
 	n := len(a)
 	if n == 0 {
@@ -51,8 +79,12 @@ func randomInt(min, max int) int {
 	return min + rand.Intn(max - min + 1)
 }
 
-func randomFloat(min, max float64) float64 {
+func randomFloat64(min, max float64) float64 {
 	return min + rand.Float64() * (max - min)
+}
+
+func randomFloat32(min, max float32) float32 {
+	return min + rand.Float32() * (max - min)
 }
 
 func randomBool() bool {
