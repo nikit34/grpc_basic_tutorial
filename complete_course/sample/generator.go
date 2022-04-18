@@ -57,3 +57,25 @@ func NewRAM() *pb.Memory {
 	}
 	return ram
 }
+
+func NewSSD() *pb.Storage {
+	ssd := &pb.Storage{
+		Driver: pb.Storage_SSD,
+		Memory: &pb.Memory{
+			Value: uint64(randomInt(128, 1024)),
+			Unit: pb.Memory_GIGABYTE,
+		},
+	}
+	return ssd
+}
+
+func NewHDD() *pb.Storage {
+	hdd := &pb.Storage{
+		Driver: pb.Storage_HDD,
+		Memory: &pb.Memory{
+			Value: uint64(randomInt(1, 6)),
+			Unit: pb.Memory_TERABYTE,
+		},
+	}
+	return hdd
+}
