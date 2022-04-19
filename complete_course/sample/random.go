@@ -6,8 +6,6 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/google/uuid"
-
 	"github.com/nikit34/grpc_basic_tutorial/complete_course/pb"
 )
 
