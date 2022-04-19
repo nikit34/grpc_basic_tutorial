@@ -55,7 +55,7 @@ func TestServerCreateLaptop(t *testing.T) {
 		{
 			name: "success_duplicate_id",
 			laptop: laptopDuplicateID,
-			store: service.NewInMemoryLaptopStore(),
+			store: storeDuplicateID,
 			code: codes.AlreadyExists,
 		},
 	}
