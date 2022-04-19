@@ -23,8 +23,6 @@ func TestToBinaryFileSerializer(t *testing.T) {
 }
 
 func TestFromBinaryFileSerializer(t *testing.T){
-	t.Parallel()
-
 	binaryFile := "../tmp/laptop.bin"
 	laptop1 := sample.NewLaptop()
 	laptop2 := &pb.Laptop{}
