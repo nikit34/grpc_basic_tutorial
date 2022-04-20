@@ -14,12 +14,13 @@ import (
 
 
 type LaptopServer struct {
+	pb.UnimplementedLaptopServiceServer
 	Store LaptopStore
 }
 
-func NewLaptopServer(laptopStore LaptopStore) *LaptopServer {
+func NewLaptopServer(store LaptopStore) *LaptopServer {
 	return &LaptopServer{
-		Store: laptopStore,
+		Store: store,
 	}
 }
 
