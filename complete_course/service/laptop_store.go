@@ -16,6 +16,7 @@ var ErrAlreadyExists = errors.New("record already exists")
 type LaptopStore interface {
 	Save(laptop *pb.Laptop) error
 	Find(id string) (*pb.Laptop, error)
+	Search(filter *pb.Filter, found func(laptop *pb.Laptop) error) error
 }
 
 type InMemoryLaptopStore struct {
@@ -63,4 +64,12 @@ func (store *InMemoryLaptopStore) Find(id string) (*pb.Laptop, error) {
 	}
 
 	return other, nil
+}
+
+func (store *InMemoryLaptopStore) Search(
+	filter *pb.Filter,
+	found func(laptop *pb.Laptop) error,
+) error {
+	store.mutex.RLock()
+	defer store.mutex.RUnlock()
 }
