@@ -2,6 +2,7 @@ package service_test
 
 import (
 	"context"
+	"io"
 	"net"
 	"testing"
 
@@ -18,7 +19,7 @@ import (
 func TestClientCreateLaptop(t *testing.T) {
 	t.Parallel()
 
-	laptopServer, serverAddress := startTestLaptopServer(t)
+	laptopServer, serverAddress := startTestLaptopServer(t, service.NewInMemoryLaptopStore())
 	laptopClient := newTestLaptopClient(t, serverAddress)
 
 	laptop := sample.NewLaptop()
@@ -84,28 +85,31 @@ func TestClientSearchLaptop(t *testing.T) {
 		require.NoError(t, err)
 	}
 
-	laptopServer, serverAddress := startTestLaptopServer(t)
+	_, serverAddress := startTestLaptopServer(t, store)
 	laptopClient := newTestLaptopClient(t, serverAddress)
 
-	laptop := sample.NewLaptop()
-	expectedID := laptop.Id
-	req := &pb.CreateLaptopRequest{
-		Laptop: laptop,
+	req := &pb.CreateLaptopRequest{Filter: filter}
+	stream, err := laptopClient.SearchLaptop(context.Background(), req)
+
+	require.NoError(t, err)
+
+	found := 0
+	for {
+		res, err := stream.Recv()
+		if err == io.EOF {
+			break
+		}
+
+		require.NoError(t, err)
+		require.Contains(t, expectedIDs, res.GetLaptop().GetId())
+
+		found += 1
 	}
 
-	res, err := laptopClient.CreateLaptop(context.Background(), req)
-	require.NoError(t, err)
-	require.NotNil(t, res)
-	require.Equal(t, expectedID, res.Id)
-
-	other, err := laptopServer.Store.Find(res.Id)
-	require.NoError(t, err)
-	require.NotNil(t, other)
-
-	requireSameLaptop(t, laptop, other)
+	require.Equal(t, len(expectedIDs), found)
 }
 
-func startTestLaptopServer(t *testing.T) (*service.LaptopServer, string) {
+func startTestLaptopServer(t *testing.T, store service.LaptopStore) (*service.LaptopServer, string) {
 	laptopServer := service.NewLaptopServer(service.NewInMemoryLaptopStore())
 	grpcServer := grpc.NewServer()
 
