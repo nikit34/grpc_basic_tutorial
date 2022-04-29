@@ -80,12 +80,13 @@ func (server *LaptopServer) CreateLaptop(
 
 func (server *LaptopServer) SearchLaptop(
 	req *pb.SearchLaptopRequest,
-	stream *pb.LaptopService_SearchLaptopServer,
+	stream pb.LaptopService_SearchLaptopServer,
 ) error {
 	filter := req.GetFilter()
 	log.Printf("receive a search-laptop request with filter: %v", filter)
 
 	err := server.Store.Search(
+		stream.Context(),
 		filter,
 		func(laptop *pb.Laptop) error {
 			res := &pb.SearchLaptopResponse{Laptop: laptop}
