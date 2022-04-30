@@ -2,6 +2,7 @@ package service_test
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"net"
 	"testing"
@@ -88,7 +89,7 @@ func TestClientSearchLaptop(t *testing.T) {
 	_, serverAddress := startTestLaptopServer(t, store)
 	laptopClient := newTestLaptopClient(t, serverAddress)
 
-	req := &pb.CreateLaptopRequest{Filter: filter}
+	req := &pb.SearchLaptopRequest{Filter: filter}
 	stream, err := laptopClient.SearchLaptop(context.Background(), req)
 
 	require.NoError(t, err)
