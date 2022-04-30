@@ -73,14 +73,14 @@ func TestClientSearchLaptop(t *testing.T) {
 			laptop.PriceUsd = 1999
 			laptop.Cpu.NumberCores = 4
 			laptop.Cpu.MinGhz = 2.5
-			laptop.Cpu.MaxGhz = 4.5
+			laptop.Cpu.MaxGhz = laptop.Cpu.MinGhz + 2.0
 			laptop.Ram = &pb.Memory{Value: 16, Unit: pb.Memory_GIGABYTE}
 			expectedIDs[laptop.Id] = true
 		case 5:
 			laptop.PriceUsd = 2000
 			laptop.Cpu.NumberCores = 6
 			laptop.Cpu.MinGhz = 2.8
-			laptop.Cpu.MaxGhz = 5.0
+			laptop.Cpu.MaxGhz = laptop.Cpu.MinGhz + 2.0
 			laptop.Ram = &pb.Memory{Value: 64, Unit: pb.Memory_GIGABYTE}
 			expectedIDs[laptop.Id] = true
 		}
