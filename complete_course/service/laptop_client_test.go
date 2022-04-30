@@ -2,12 +2,12 @@ package service_test
 
 import (
 	"context"
-	"fmt"
 	"io"
 	"net"
 	"testing"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 
 	"github.com/nikit34/grpc_basic_tutorial/complete_course/pb"
 	"github.com/nikit34/grpc_basic_tutorial/complete_course/sample"
@@ -128,7 +128,7 @@ func startTestLaptopServer(t *testing.T, store service.LaptopStore) (*service.La
 }
 
 func newTestLaptopClient(t *testing.T, serverAddress string) pb.LaptopServiceClient {
-	conn, err := grpc.Dial(serverAddress, grpc.WithInsecure())
+	conn, err := grpc.Dial(serverAddress, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	require.NoError(t, err)
 	return pb.NewLaptopServiceClient(conn)
 }
