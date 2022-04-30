@@ -2,6 +2,7 @@ package service_test
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"net"
 	"testing"
@@ -47,7 +48,10 @@ func TestClientSearchLaptop(t *testing.T) {
 		MaxPriceUsd: 2000,
 		MinCpuCores: 4,
 		MinCpuGhz: 2.2,
-		MinRam: &pb.Memory{Value: 8, Unit: pb.Memory_GIGABYTE},
+		MinRam: &pb.Memory{
+			Value: 8,
+			Unit: pb.Memory_GIGABYTE,
+		},
 	}
 
 	store := service.NewInMemoryLaptopStore()
@@ -88,7 +92,7 @@ func TestClientSearchLaptop(t *testing.T) {
 	_, serverAddress := startTestLaptopServer(t, store)
 	laptopClient := newTestLaptopClient(t, serverAddress)
 
-	req := &pb.CreateLaptopRequest{Filter: filter}
+	req := &pb.SearchLaptopRequest{Filter: filter}
 	stream, err := laptopClient.SearchLaptop(context.Background(), req)
 
 	require.NoError(t, err)
