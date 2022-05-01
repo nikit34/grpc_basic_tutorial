@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 
 	"github.com/nikit34/grpc_basic_tutorial/complete_course/pb"
 	"github.com/nikit34/grpc_basic_tutorial/complete_course/sample"
@@ -47,7 +48,10 @@ func TestClientSearchLaptop(t *testing.T) {
 		MaxPriceUsd: 2000,
 		MinCpuCores: 4,
 		MinCpuGhz: 2.2,
-		MinRam: &pb.Memory{Value: 8, Unit: pb.Memory_GIGABYTE},
+		MinRam: &pb.Memory{
+			Value: 8,
+			Unit: pb.Memory_GIGABYTE,
+		},
 	}
 
 	store := service.NewInMemoryLaptopStore()
@@ -69,14 +73,14 @@ func TestClientSearchLaptop(t *testing.T) {
 			laptop.PriceUsd = 1999
 			laptop.Cpu.NumberCores = 4
 			laptop.Cpu.MinGhz = 2.5
-			laptop.Cpu.MaxGhz = 4.5
+			laptop.Cpu.MaxGhz = laptop.Cpu.MinGhz + 2.0
 			laptop.Ram = &pb.Memory{Value: 16, Unit: pb.Memory_GIGABYTE}
 			expectedIDs[laptop.Id] = true
 		case 5:
 			laptop.PriceUsd = 2000
 			laptop.Cpu.NumberCores = 6
 			laptop.Cpu.MinGhz = 2.8
-			laptop.Cpu.MaxGhz = 5.0
+			laptop.Cpu.MaxGhz = laptop.Cpu.MinGhz + 2.0
 			laptop.Ram = &pb.Memory{Value: 64, Unit: pb.Memory_GIGABYTE}
 			expectedIDs[laptop.Id] = true
 		}
@@ -88,7 +92,7 @@ func TestClientSearchLaptop(t *testing.T) {
 	_, serverAddress := startTestLaptopServer(t, store)
 	laptopClient := newTestLaptopClient(t, serverAddress)
 
-	req := &pb.CreateLaptopRequest{Filter: filter}
+	req := &pb.SearchLaptopRequest{Filter: filter}
 	stream, err := laptopClient.SearchLaptop(context.Background(), req)
 
 	require.NoError(t, err)
@@ -124,7 +128,7 @@ func startTestLaptopServer(t *testing.T, store service.LaptopStore) (*service.La
 }
 
 func newTestLaptopClient(t *testing.T, serverAddress string) pb.LaptopServiceClient {
-	conn, err := grpc.Dial(serverAddress, grpc.WithInsecure())
+	conn, err := grpc.Dial(serverAddress, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	require.NoError(t, err)
 	return pb.NewLaptopServiceClient(conn)
 }
