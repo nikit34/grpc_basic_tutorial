@@ -15,14 +15,15 @@ import (
 
 
 type LaptopServer struct {
+	pb.UnimplementedLaptopServiceServer
 	imageStore ImageStore
 	laptopStore LaptopStore
 }
 
 func NewLaptopServer(laptopStore LaptopStore, imageStore ImageStore) *LaptopServer {
 	return &LaptopServer{
-		laptopStore: laptopStore,
 		imageStore: imageStore,
+		laptopStore: laptopStore,
 	}
 }
 
