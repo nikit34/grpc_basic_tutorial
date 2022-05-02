@@ -15,13 +15,14 @@ import (
 
 
 type LaptopServer struct {
-	pb.UnimplementedLaptopServiceServer
-	Store LaptopStore
+	imageStore ImageStore
+	laptopStore LaptopStore
 }
 
-func NewLaptopServer(store LaptopStore) *LaptopServer {
+func NewLaptopServer(laptopStore LaptopStore, imageStore ImageStore) *LaptopServer {
 	return &LaptopServer{
-		Store: store,
+		laptopStore,
+		imageStore,
 	}
 }
 
@@ -107,5 +108,5 @@ func (server *LaptopServer) SearchLaptop(
 }
 
 func (server *LaptopServer) UploadImage(stream pb.LaptopService_UploadImageServer) error {
-	
+
 }
