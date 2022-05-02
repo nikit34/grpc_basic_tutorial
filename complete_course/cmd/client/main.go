@@ -15,8 +15,7 @@ import (
 )
 
 
-func createLaptop(laptopClient pb.LaptopServiceClient) {
-	laptop := sample.NewLaptop()
+func createLaptop(laptopClient pb.LaptopServiceClient, laptop *pb.Laptop) {
 	req := &pb.CreateLaptopRequest{
 		Laptop: laptop,
 	}
@@ -71,21 +70,17 @@ func searchLaptop(laptopClient pb.LaptopServiceClient, filter *pb.Filter) {
 	}
 }
 
-func main() {
-	serverAddress := flag.String("address", "", "server address")
-	flag.Parse()
+func uploadImage(laptopClient pb.LaptopServiceClient, laptopID string, imagePath string) {
+	
+}
 
-	log.Printf("dial server %s", *serverAddress)
+func testCreateLaptop(laptopClient pb.LaptopServiceClient) {
+	createLaptop(laptopClient, sample.NewLaptop())
+}
 
-	conn, err := grpc.Dial(*serverAddress, grpc.WithInsecure())
-	if err != nil {
-		log.Fatal("cannot dial server: ", err)
-	}
-
-	laptopClient := pb.NewLaptopServiceClient(conn)
-
+func testSearchLaptop(laptopClient pb.LaptopServiceClient) {
 	for i := 0; i < 10; i++ {
-		createLaptop(laptopClient)
+		createLaptop(laptopClient, sample.NewLaptop())
 	}
 
 	filter := &pb.Filter{
@@ -99,4 +94,26 @@ func main() {
 	}
 
 	searchLaptop(laptopClient, filter)
+}
+
+func testUploadImage(laptopClient pb.LaptopServiceClient) {
+	laptop := sample.NewLaptop()
+	createLaptop(laptopClient, laptop)
+	uploadImage(laptopClient, laptop.GetId(), "tmp/laptop.jpg")
+}
+
+func main() {
+	serverAddress := flag.String("address", "", "server address")
+	flag.Parse()
+
+	log.Printf("dial server %s", *serverAddress)
+
+	conn, err := grpc.Dial(*serverAddress, grpc.WithInsecure())
+	if err != nil {
+		log.Fatal("cannot dial server: ", err)
+	}
+
+	laptopClient := pb.NewLaptopServiceClient(conn)
+
+
 }
