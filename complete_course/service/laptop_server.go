@@ -21,8 +21,8 @@ type LaptopServer struct {
 
 func NewLaptopServer(laptopStore LaptopStore, imageStore ImageStore) *LaptopServer {
 	return &LaptopServer{
-		laptopStore,
-		imageStore,
+		laptopStore: laptopStore,
+		imageStore: imageStore,
 	}
 }
 
@@ -58,7 +58,7 @@ func (server *LaptopServer) CreateLaptop(
 		return nil, status.Error(codes.DeadlineExceeded, "deadline is exceeded")
 	}
 
-	err := server.Store.Save(laptop)
+	err := server.laptopStore.Save(laptop)
 	if err != nil {
 		var code codes.Code
 		if errors.Is(err, ErrAlreadyExists) {
@@ -86,7 +86,7 @@ func (server *LaptopServer) SearchLaptop(
 	filter := req.GetFilter()
 	log.Printf("receive a search-laptop request with filter: %v", filter)
 
-	err := server.Store.Search(
+	err := server.laptopStore.Search(
 		stream.Context(),
 		filter,
 		func(laptop *pb.Laptop) error {
@@ -108,5 +108,5 @@ func (server *LaptopServer) SearchLaptop(
 }
 
 func (server *LaptopServer) UploadImage(stream pb.LaptopService_UploadImageServer) error {
-
+	return nil
 }
