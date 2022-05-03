@@ -32,6 +32,22 @@ func streamInterceptor(
 	return handler(srv, stream)
 }
 
+func createUser(userStore service.UserStore, username, password, role string) error {
+	user, err := service.NewUser(username, password, role)
+	if err != nil {
+		return err
+	}
+	return userStore.Save(user)
+}
+
+func seedUsers(userStore service.UserStore) error {
+	err := createUser(userStore, "admin1", "secret", "admin")
+	if err != nil {
+		return err
+	}
+	return createUser(userStore, "user1", "secret", "user")
+}
+
 const (
 	secretKey = "secret"
 	tokenDuration = 15 * time.Minute
