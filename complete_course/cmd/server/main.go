@@ -1,11 +1,12 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
-	"context"
 	"log"
 	"net"
+	"time"
 
 	"google.golang.org/grpc"
 
@@ -31,11 +32,20 @@ func streamInterceptor(
 	return handler(srv, stream)
 }
 
+const (
+	secretKey = "secret"
+	tokenDuration = 15 * time.Minute
+)
+
 func main() {
 	port := flag.Int("port", 0, "server port")
 	flag.Parse()
 
 	log.Printf("Start server on port %d", *port)
+
+	userStore := service.NewInMemoryUserStore()
+	jwtManager := service.NewJWTManager(secretKey, tokenDuration)
+	authServer := service.NewAuthServer(userStore, jwtManager)
 
 	laptopStore := service.NewInMemoryLaptopStore()
 	imageStore := service.NewDiskImageStore("img")
@@ -47,6 +57,7 @@ func main() {
 		grpc.StreamInterceptor(streamInterceptor),
 	)
 
+	pb.RegisterAuthServiceServer(grpcServer, authServer)
 	pb.RegisterLaptopServiceServer(grpcServer, laptopServer)
 
 	address := fmt.Sprintf("0.0.0.0:%d", *port)

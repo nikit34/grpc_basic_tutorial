@@ -10,6 +10,7 @@ import (
 
 
 type AuthServer struct {
+	pb.UnimplementedAuthServiceServer
 	userStore UserStore
 	jwtManager *JWTManager
 }
