@@ -21,6 +21,16 @@ func unaryInterceptor(
 	return handler(ctx, req)
 }
 
+func streamInterceptor(
+	srv interface{},
+	stream grpc.ServerStream,
+	info *grpc.StreamServerInfo,
+	handler grpc.StreamHandler,
+) error {
+	log.Println("--> sream interceptor: ", info.FullMethod)
+	return handler(srv, stream)
+}
+
 func main() {
 	port := flag.Int("port", 0, "server port")
 	flag.Parse()
@@ -32,7 +42,10 @@ func main() {
 	ratingStore := service.NewInMemoryRatingStore()
 
 	laptopServer := service.NewLaptopServer(laptopStore, imageStore, ratingStore)
-	grpcServer := grpc.NewServer(grpc.UnaryInterceptor(unaryInterceptor))
+	grpcServer := grpc.NewServer(
+		grpc.UnaryInterceptor(unaryInterceptor),
+		grpc.StreamInterceptor(streamInterceptor),
+	)
 
 	pb.RegisterLaptopServiceServer(grpcServer, laptopServer)
 
