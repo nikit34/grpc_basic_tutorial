@@ -121,7 +121,7 @@ func uploadImage(laptopClient pb.LaptopServiceClient, laptopID string, imagePath
 
 		err = stream.Send(req)
 		if err != nil {
-			log.Fatal("cannot send chunk to server: ", err)
+			log.Fatal("cannot send chunk to server: ", err, stream.RecvMsg(nil))
 		}
 	}
 
