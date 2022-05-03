@@ -1,2 +1,3 @@
 complete_course/tmp/*
+!complete_course/tmp/laptop.jpg
 complete_course/img/*
