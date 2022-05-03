@@ -60,6 +60,11 @@ func main() {
 	log.Printf("Start server on port %d", *port)
 
 	userStore := service.NewInMemoryUserStore()
+	err := seedUsers(userStore)
+	if err != nil {
+		log.Fatal("cannot seed users")
+	}
+
 	jwtManager := service.NewJWTManager(secretKey, tokenDuration)
 	authServer := service.NewAuthServer(userStore, jwtManager)
 
