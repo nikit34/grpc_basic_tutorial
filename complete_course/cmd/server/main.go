@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"context"
 	"log"
 	"net"
 
@@ -12,6 +13,13 @@ import (
 	"github.com/nikit34/grpc_basic_tutorial/complete_course/service"
 )
 
+
+func unaryInterceptor(
+	ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler,
+) (interface{}, error) {
+	log.Println("--> unary interceptor: ", info.FullMethod)
+	return handler(ctx, req)
+}
 
 func main() {
 	port := flag.Int("port", 0, "server port")
@@ -24,7 +32,7 @@ func main() {
 	ratingStore := service.NewInMemoryRatingStore()
 
 	laptopServer := service.NewLaptopServer(laptopStore, imageStore, ratingStore)
-	grpcServer := grpc.NewServer()
+	grpcServer := grpc.NewServer(grpc.UnaryInterceptor(unaryInterceptor))
 
 	pb.RegisterLaptopServiceServer(grpcServer, laptopServer)
 
