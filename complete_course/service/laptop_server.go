@@ -156,6 +156,8 @@ func (server *LaptopServer) UploadImage(stream pb.LaptopService_UploadImageServe
 		chunk := req.GetChunkData()
 		size := len(chunk)
 
+		log.Printf("received chunk with size: %d bytes", size)
+
 		imageSize += size
 		if imageSize > maxImageSize {
 			return logError(status.Errorf(codes.InvalidArgument, "image is too large %d > %d", imageSize, maxImageSize))
