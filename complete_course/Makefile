@@ -1,4 +1,4 @@
-.PHONY: proto clean_proto client server test
+.PHONY: proto clean_proto client server cert test
 
 proto:
 	protoc --proto_path=proto proto/*.proto --go_out=. --go-grpc_out=.
@@ -11,6 +11,9 @@ client:
 
 server:
 	go run cmd/server/main.go --port 8080
+
+cert:
+	cd cert; ./gen.sh; cd ..
 
 test:
 	go test --cover --race ./...
