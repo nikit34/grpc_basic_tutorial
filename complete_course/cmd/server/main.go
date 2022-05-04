@@ -15,23 +15,6 @@ import (
 )
 
 
-func unaryInterceptor(
-	ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler,
-) (interface{}, error) {
-	log.Println("--> unary interceptor: ", info.FullMethod)
-	return handler(ctx, req)
-}
-
-func streamInterceptor(
-	srv interface{},
-	stream grpc.ServerStream,
-	info *grpc.StreamServerInfo,
-	handler grpc.StreamHandler,
-) error {
-	log.Println("--> sream interceptor: ", info.FullMethod)
-	return handler(srv, stream)
-}
-
 func createUser(userStore service.UserStore, username, password, role string) error {
 	user, err := service.NewUser(username, password, role)
 	if err != nil {
@@ -53,6 +36,15 @@ const (
 	tokenDuration = 15 * time.Minute
 )
 
+func accessibleRoles() map[string][]string {
+	const laptopServicePath = "/proto.LaptopService/"
+	return map[string][]string{
+		laptopServicePath + "CreateLaptop": {"admin"},
+		laptopServicePath + "UploadImage": {"admin"},
+		laptopServicePath + "RateLaptop": {"admin", "user"},
+	}
+}
+
 func main() {
 	port := flag.Int("port", 0, "server port")
 	flag.Parse()
@@ -71,11 +63,13 @@ func main() {
 	laptopStore := service.NewInMemoryLaptopStore()
 	imageStore := service.NewDiskImageStore("img")
 	ratingStore := service.NewInMemoryRatingStore()
-
 	laptopServer := service.NewLaptopServer(laptopStore, imageStore, ratingStore)
+
+	interceptor := service.NewAuthInterceptor(jwtManager, accessibleRoles())
+
 	grpcServer := grpc.NewServer(
-		grpc.UnaryInterceptor(unaryInterceptor),
-		grpc.StreamInterceptor(streamInterceptor),
+		grpc.UnaryInterceptor(interceptor.Unary()),
+		grpc.StreamInterceptor(interceptor.Stream()),
 	)
 
 	pb.RegisterAuthServiceServer(grpcServer, authServer)
