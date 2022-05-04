@@ -12,5 +12,8 @@ client:
 server:
 	go run cmd/server/main.go --port 8080
 
+cert:
+	cd cert; ./gen.sh; cd ..
+
 test:
 	go test --cover --race ./...
