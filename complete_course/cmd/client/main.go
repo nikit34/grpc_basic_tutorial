@@ -1,14 +1,9 @@
 package main
 
 import (
-	"bufio"
-	"context"
 	"flag"
 	"fmt"
-	"io"
 	"log"
-	"os"
-	"path/filepath"
 	"strings"
 	"time"
 
@@ -16,8 +11,6 @@ import (
 	"github.com/nikit34/grpc_basic_tutorial/complete_course/pb"
 	"github.com/nikit34/grpc_basic_tutorial/complete_course/sample"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
 
