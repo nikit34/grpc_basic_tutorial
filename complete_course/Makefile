@@ -1,4 +1,4 @@
-.PHONY: proto clean_proto client server test
+.PHONY: proto clean_proto client server cert test
 
 proto:
 	protoc --proto_path=proto proto/*.proto --go_out=. --go-grpc_out=.
