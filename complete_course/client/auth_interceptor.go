@@ -87,5 +87,24 @@ func (interceptor *AuthInterceptor) Unary() grpc.UnaryClientInterceptor {
 		if interceptor.authMethods[method] {
 			return invoker(interceptor.attachToken(ctx), method, req, reply, cc, opts...)
 		}
+		return invoker(ctx, method, req, reply, cc, opts...)
+	}
+}
+
+func (interceptor *AuthInterceptor) Stream() grpc.StreamClientInterceptor {
+	return func(
+		ctx context.Context,
+		desc *grpc.StreamDesc,
+		cc *grpc.ClientConn,
+		method string,
+		streamer grpc.Streamer,
+		opts ...grpc.CallOption,
+	) (grpc.ClientStream, error) {
+		log.Printf("--> stream interceptor: %s", method)
+
+		if interceptor.authMethods[method] {
+			return streamer(interceptor.attachToken(ctx), desc, cc, method, opts...)
+		}
+		return streamer(ctx, desc, cc, method, opts...)
 	}
 }
