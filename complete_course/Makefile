@@ -7,10 +7,10 @@ clean_proto:
 	rm -rf pb/*
 
 client:
-	go run cmd/client/main.go --address 0.0.0.0:8080
+	go run cmd/client/main.go --address 0.0.0.0:8080 -tls
 
 server:
-	go run cmd/server/main.go --port 8080
+	go run cmd/server/main.go --port 8080 -tls
 
 cert:
 	cd cert; ./gen.sh; cd ..
