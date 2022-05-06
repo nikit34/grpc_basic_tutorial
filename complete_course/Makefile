@@ -17,3 +17,6 @@ cert:
 
 test:
 	go test --cover --race ./...
+
+evans:
+	evans -r repl -p 8080
