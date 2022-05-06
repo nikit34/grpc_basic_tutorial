@@ -1,4 +1,4 @@
-.PHONY: proto clean_proto client server server1 server2 cert test evans
+.PHONY: proto clean_proto client client-tls server server1 server2 cert test evans
 
 proto:
 	protoc --proto_path=proto proto/*.proto --go_out=. --go-grpc_out=.
@@ -8,6 +8,9 @@ clean_proto:
 
 client:
 	go run cmd/client/main.go --address 0.0.0.0:8080
+
+client-tls:
+	go run cmd/client/main.go --address 0.0.0.0:8080 --tls
 
 server:
 	go run cmd/server/main.go --port 8080
