@@ -1,4 +1,4 @@
-.PHONY: proto clean_proto client server cert test
+.PHONY: proto clean_proto client server cert test evans
 
 proto:
 	protoc --proto_path=proto proto/*.proto --go_out=. --go-grpc_out=.
@@ -17,3 +17,6 @@ cert:
 
 test:
 	go test --cover --race ./...
+
+evans:
+	evans -r repl -p 8080
