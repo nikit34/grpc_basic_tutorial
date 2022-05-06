@@ -7,7 +7,7 @@ clean_proto:
 	rm -rf pb/*
 
 client:
-	go run cmd/client/main.go --address 0.0.0.0:8080 -tls
+	go run cmd/client/main.go --address 0.0.0.0:8080
 
 server:
 	go run cmd/server/main.go --port 8080 -tls
