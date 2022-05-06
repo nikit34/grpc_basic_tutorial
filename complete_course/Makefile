@@ -1,4 +1,4 @@
-.PHONY: proto clean_proto client server cert test evans
+.PHONY: proto clean_proto client server server1 server2 cert test evans
 
 proto:
 	protoc --proto_path=proto proto/*.proto --go_out=. --go-grpc_out=.
@@ -11,6 +11,12 @@ client:
 
 server:
 	go run cmd/server/main.go --port 8080 -tls
+
+server1:
+	go run cmd/server/main.go --port 50051
+
+server2:
+	go run cmd/server/main.go --port 50052
 
 cert:
 	cd cert; ./gen.sh; cd ..
