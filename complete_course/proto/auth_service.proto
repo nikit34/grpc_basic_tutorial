@@ -1,6 +1,6 @@
 syntax = "proto3";
 package proto;
-option go_package = "./pb";
+option go_package = ".;pb";
 
 import "google/api/annotations.proto";
 
@@ -17,7 +17,7 @@ message LoginResponse {
 service AuthService {
     rpc Login(LoginRequest) returns (LoginResponse) {
         option (google.api.http) = {
-            port: "/v1/auth/login"
+            post: "/v1/auth/login"
             body: "*"
         };
     };

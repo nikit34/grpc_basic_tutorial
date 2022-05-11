@@ -1,6 +1,6 @@
 syntax ="proto3";
 package proto;
-option go_package = "./pb";
+option go_package = ".;pb";
 
 import "laptop_msg.proto";
 import "filter_msg.proto";
@@ -54,25 +54,24 @@ message RateLaptopResponse {
 service LaptopService {
     rpc CreateLaptop(CreateLaptopRequest) returns (CreateLaptopResponse) {
         option (google.api.http) = {
-            port: "/v1/laptop/create"
+            post: "/v1/laptop/create"
             body: "*"
         };
     };
     rpc SearchLaptop(SearchLaptopRequest) returns (stream SearchLaptopResponse) {
         option (google.api.http) = {
-            port: "/v1/laptop/search"
-            body: "*"
+            get: "/v1/laptop/search"
         };
     };
     rpc UploadImage(stream UploadImageRequest) returns (UploadImageResponse) {
         option (google.api.http) = {
-            port: "/v1/laptop/upload_image"
+            post: "/v1/laptop/upload_image"
             body: "*"
         };
     };
     rpc RateLaptop(stream RateLaptopRequest) returns (stream RateLaptopResponse) {
         option (google.api.http) = {
-            port: "/v1/laptop/rate"
+            post: "/v1/laptop/rate"
             body: "*"
         };
     };
