@@ -1,7 +1,7 @@
 .PHONY: proto clean_proto client client-tls server server1 server2 server-tls server1-tls server2-tls cert test evans
 
 proto:
-	protoc --proto_path=proto proto/*.proto --go_out=. --go-grpc_out=.
+	protoc --proto_path=proto proto/*.proto --go_out=. --go-grpc_out=. --grpc-gateway_out=:. --swagger_out=:swagger
 
 clean_proto:
 	rm -rf pb/*

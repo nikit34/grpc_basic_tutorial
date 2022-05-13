@@ -1,0 +1,5 @@
+make --dry-run --always-make --keep-going --print-directory
+make: Entering directory '/mnt/c/Users/permi/source/repos/grpc_basic_tutorial/complete_course'
+protoc --proto_path=proto proto/*.proto --go_out=. --go-grpc_out=.
+make: Leaving directory '/mnt/c/Users/permi/source/repos/grpc_basic_tutorial/complete_course'
+ 
