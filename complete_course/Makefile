@@ -31,7 +31,7 @@ server2-tls:
 	go run cmd/server/main.go --port 50052 --tls
 
 rest:
-	go run cmd/server/main.go --port 8081 --type rest
+	go run cmd/server/main.go --port 8081 --type rest --endpoint 0.0.0.0:8080
 
 cert:
 	cd cert; ./gen.sh; cd ..

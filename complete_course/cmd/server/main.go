@@ -122,17 +122,23 @@ func runRESTServer(
 	jwtManager *service.JWTManager,
 	enableTLS bool,
 	listener net.Listener,
+	grpcEndpoint string,
 ) error {
 	mux := runtime.NewServeMux()
+
+	dialOptions := []grpc.DialOption{
+		grpc.WithInsecure(),
+	}
+
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	err := pb.RegisterAuthServiceHandlerServer(ctx, mux, authServer)
+	err := pb.RegisterAuthServiceHandlerFromEndpoint(ctx, mux, grpcEndpoint, dialOptions)
 	if err != nil {
 		return err
 	}
 
-	err = pb.RegisterLaptopServiceHandlerServer(ctx, mux, laptopServer)
+	err = pb.RegisterLaptopServiceHandlerFromEndpoint(ctx, mux, grpcEndpoint, dialOptions)
 	if err != nil {
 		return err
 	}
@@ -149,6 +155,7 @@ func main() {
 	port := flag.Int("port", 0, "server port")
 	enableTLS := flag.Bool("tls", false, "enable TLS/SSL")
 	serverType := flag.String("type", "grpc", "server type (grpc/rest)")
+	endPoint := flag.String("endpoint", "", "gRPC endpoint")
 	flag.Parse()
 
 	log.Printf("Start server on port %d, TLS = %t", *port, *enableTLS)
@@ -176,7 +183,7 @@ func main() {
 	if *serverType == "grpc" {
 		err = runGRPCServer(authServer, laptopServer, jwtManager, *enableTLS, listener)
 	} else {
-		err = runRESTServer(authServer, laptopServer, jwtManager, *enableTLS, listener)
+		err = runRESTServer(authServer, laptopServer, jwtManager, *enableTLS, listener, *endPoint)
 	}
 	if err != nil {
 		log.Fatal("Cannot start server: ", err)
