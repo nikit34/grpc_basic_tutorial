@@ -1,4 +1,4 @@
-.PHONY: proto clean_proto client client-tls server server1 server2 server-tls server1-tls server2-tls cert test evans
+.PHONY: proto clean_proto client client-tls server server1 server2 server-tls server1-tls server2-tls rest cert test evans
 
 proto:
 	protoc --proto_path=proto proto/*.proto --go_out=. --go-grpc_out=. --grpc-gateway_out=:. --swagger_out=:swagger
@@ -29,6 +29,9 @@ server1-tls:
 
 server2-tls:
 	go run cmd/server/main.go --port 50052 --tls
+
+rest:
+	go run cmd/server/main.go --port 8081 --type rest
 
 cert:
 	cd cert; ./gen.sh; cd ..
