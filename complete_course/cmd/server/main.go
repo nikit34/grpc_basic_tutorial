@@ -74,6 +74,47 @@ func loadTLSCredentials() (credentials.TransportCredentials, error) {
 	return credentials.NewTLS(config), nil
 }
 
+func runGRPCServer(
+	authServer pb.AuthServiceServer,
+	laptopServer pb.LaptopServiceServer,
+	jwtManager *service.JWTManager,
+	enableTLS bool,
+	listener net.Listener,
+) error {
+	interceptor := service.NewAuthInterceptor(jwtManager, accessibleRoles())
+	serverOptions := []grpc.ServerOption{
+		grpc.UnaryInterceptor(interceptor.Unary()),
+		grpc.StreamInterceptor(interceptor.Stream()),
+	}
+
+	if enableTLS {
+		tlsCredentials, err := loadTLSCredentials()
+		if err != nil {
+			return fmt.Errorf("cannot load TLS credentials: %w", err)
+		}
+
+		serverOptions = append(serverOptions, grpc.Creds(tlsCredentials))
+	}
+
+	grpcServer := grpc.NewServer(serverOptions...)
+
+	pb.RegisterAuthServiceServer(grpcServer, authServer)
+	pb.RegisterLaptopServiceServer(grpcServer, laptopServer)
+	reflection.Register(grpcServer)
+
+	return grpcServer.Serve(listener)
+}
+
+func runRESTServer(
+	authServer pb.AuthServiceServer,
+	laptopServer pb.LaptopServiceServer,
+	jwtManager *service.JWTManager,
+	enableTLS bool,
+	listener net.Listener,
+) error {
+
+}
+
 func main() {
 	port := flag.Int("port", 0, "server port")
 	enableTLS := flag.Bool("tls", false, "enable TLS/SSL")
@@ -95,34 +136,13 @@ func main() {
 	ratingStore := service.NewInMemoryRatingStore()
 	laptopServer := service.NewLaptopServer(laptopStore, imageStore, ratingStore)
 
-	interceptor := service.NewAuthInterceptor(jwtManager, accessibleRoles())
-	serverOptions := []grpc.ServerOption{
-		grpc.UnaryInterceptor(interceptor.Unary()),
-		grpc.StreamInterceptor(interceptor.Stream()),
-	}
-
-	if *enableTLS {
-		tlsCredentials, err := loadTLSCredentials()
-		if err != nil {
-			log.Fatal("cannot load TLS credentials: ", err)
-		}
-
-		serverOptions = append(serverOptions, grpc.Creds(tlsCredentials))
-	}
-
-	grpcServer := grpc.NewServer(serverOptions...)
-
-	pb.RegisterAuthServiceServer(grpcServer, authServer)
-	pb.RegisterLaptopServiceServer(grpcServer, laptopServer)
-	reflection.Register(grpcServer)
-
 	address := fmt.Sprintf("0.0.0.0:%d", *port)
 	listener, err := net.Listen("tcp", address)
 	if err != nil {
 		log.Fatal("Cannot start server: ", err)
 	}
 
-	err = grpcServer.Serve(listener)
+	err = runGRPCServer(authServer, laptopServer, jwtManager, *enableTLS, listener)
 	if err != nil {
 		log.Fatal("Cannot start server: ", err)
 	}
